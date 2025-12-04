@@ -35,9 +35,16 @@ module.exports.getFigureById = async (id) => {
 module.exports.getFiguresBySearch = async (queryParams = {}) => {
   return getFigures(
     {
-      $or: [
-        { name: { $regex: queryParams.search, $options: "i" } },
-        { partNumber: { $regex: queryParams.search, $options: "i" } }
+      $and: [
+        {
+          $or: [
+            { name: { $regex: queryParams.search, $options: "i" } },
+            { partNumber: { $regex: queryParams.search, $options: "i" } }
+          ]
+        },
+        queryParams.manufacturer
+          ? { manufacturer: queryParams.manufacturer }
+          : {}
       ]
     },
     queryParams,
