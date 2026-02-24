@@ -23,11 +23,11 @@ router.get("/search", async (req, res, next) => {
   }
 });
 
-router.get("/figure/:id", async (req, res, next) => {
+router.get("/figure/:figureId", async (req, res, next) => {
   try {
-    const collection = await CollectionDAO.getAllCollections({
-      figures: { $elemMatch: { _id: req.params.id } }
-    });
+    const collection = await CollectionDAO.getCollectionsIncludingFigure(
+      req.params.figureId
+    );
     res.json(collection);
   } catch (e) {
     next(e);

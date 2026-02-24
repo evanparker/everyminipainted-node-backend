@@ -37,6 +37,11 @@ module.exports.getCollectionById = async (id) => {
   return collection;
 };
 
+module.exports.getCollectionsIncludingFigure = async (id) => {
+  const collections = await getCollections({ figures: { $in: id } });
+  return collections;
+};
+
 module.exports.getCollectionsBySearch = async (queryParams = {}) => {
   return getCollections(
     {
