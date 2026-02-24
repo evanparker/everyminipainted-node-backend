@@ -15,6 +15,10 @@ module.exports.config = {
       process.env["EDIT_FIGURE_REQUIRES_ADMIN"] !== undefined
         ? toBool(process.env["EDIT_FIGURE_REQUIRES_ADMIN"])
         : true,
+    editCollectionRequiresAdmin:
+      process.env["EDIT_COLLECTION_REQUIRES_ADMIN"] !== undefined
+        ? toBool(process.env["EDIT_COLLECTION_REQUIRES_ADMIN"])
+        : true,
     editManufacturerRequiresAdmin:
       process.env["EDIT_MANUFACTURER_REQUIRES_ADMIN"] !== undefined
         ? toBool(process.env["EDIT_MANUFACTURER_REQUIRES_ADMIN"])
