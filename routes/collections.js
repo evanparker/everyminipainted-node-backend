@@ -26,7 +26,8 @@ router.get("/search", async (req, res, next) => {
 router.get("/figure/:figureId", async (req, res, next) => {
   try {
     const collection = await CollectionDAO.getCollectionsIncludingFigure(
-      req.params.figureId
+      req.params.figureId,
+      req.query
     );
     res.json(collection);
   } catch (e) {
