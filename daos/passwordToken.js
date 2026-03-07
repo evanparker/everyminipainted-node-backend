@@ -27,9 +27,10 @@ module.exports.makePasswordTokenForUserEmail = async (email) => {
     user.email,
     "Password Reset Request",
     { name: user.username, link: link },
-    "./template/requestResetPassword.handlebars"
+    "./template/requestResetPassword.handlebars",
+    "./template/requestResetPassword.txt.handlebars"
   );
-  // return { link };
+
   return { message: `Password reset email sent to ${user.email}` };
 };
 
@@ -70,7 +71,8 @@ module.exports.resetPassword = async (userId, token, password) => {
     {
       name: user.username
     },
-    "./template/resetPassword.handlebars"
+    "./template/resetPassword.handlebars",
+    "./template/resetPassword.txt.handlebars"
   );
   await passwordResetToken.deleteOne();
   return { message: `Password reset was successful for ${user.email}` };
