@@ -30,7 +30,7 @@ module.exports.makePasswordTokenForUserEmail = async (email) => {
     "./template/requestResetPassword.handlebars",
     "./template/requestResetPassword.txt.handlebars"
   );
-  // return { link };
+
   return { message: `Password reset email sent to ${user.email}` };
 };
 
