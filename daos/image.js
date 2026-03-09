@@ -7,9 +7,9 @@ module.exports.getAllImages = async () => {
   return await Image.find().lean();
 };
 
-// module.exports.getImageById = async (id) => {
-//   return await Image.findById( id ).lean();
-// };
+module.exports.getImageById = async (id) => {
+  return await Image.findById(id).lean();
+};
 
 module.exports.getImagesByIds = async (ids) => {
   return await Image.find({ _id: { $in: ids } }).lean();
@@ -22,6 +22,12 @@ module.exports.getImagesByIds = async (ids) => {
 
 module.exports.createImage = async (ImageObj) => {
   return await Image.create(ImageObj);
+};
+
+module.exports.findAndUpdateImage = async (id, ImageObj) => {
+  return await Image.findOneAndUpdate({ _id: id }, ImageObj, {
+    new: true
+  });
 };
 
 module.exports.deleteImage = async (id) => {

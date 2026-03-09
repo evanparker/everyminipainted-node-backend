@@ -11,6 +11,8 @@ const imageSchema = new mongoose.Schema({
   url: { type: String },
   s3Bucket: { type: String },
   s3Key: { type: String },
+  caption: { type: String },
+  altText: { type: String },
   createdAt: {
     type: Date,
     default: Date.now,
