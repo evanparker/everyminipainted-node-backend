@@ -38,6 +38,12 @@ router.get("/figure/:figureId", async (req, res, next) => {
 router.get("/:id", async (req, res, next) => {
   try {
     const collection = await CollectionDAO.getCollectionById(req.params.id);
+
+    if (!collection) {
+      res.status(404).json({ message: "Collection not found" });
+      return;
+    }
+
     res.json(collection);
   } catch (e) {
     next(e);
