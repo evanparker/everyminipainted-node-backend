@@ -15,7 +15,16 @@ const moderationReportSchema = new mongoose.Schema({
   description: { type: String },
   reason: {
     type: String,
-    enum: ["NSFW", "notAMini", "hateSpeech", "other"]
+    enum: [
+      "NSFW",
+      "notAMini",
+      "hateSpeech",
+      "harassment",
+      "spam",
+      "privacyViolation",
+      "intellectualPropertyViolation",
+      "other"
+    ]
   },
   status: {
     type: String,
