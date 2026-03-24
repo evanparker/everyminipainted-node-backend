@@ -11,6 +11,8 @@ The intention of this project is to be the back end for an image sharing site fo
 - Images
 
   - Create: `POST /images` - requires authentication
+  - Update: `PUT /images/:id` - requires authentication
+  - Delete: `DELETE /images/:id` - requires authentication
   - Get all: `GET /images` - public
 
 - Minis

@@ -133,3 +133,7 @@ migrate-mongo-config.*
 
 data
 data/*
+
+# Postman
+postman
+postman/*

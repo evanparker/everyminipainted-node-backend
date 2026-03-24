@@ -26,6 +26,12 @@ router.get("/search", async (req, res, next) => {
 router.get("/:id", async (req, res, next) => {
   try {
     const figure = await FigureDAO.getFigureById(req.params.id);
+
+    if (!figure) {
+      res.status(404).json({ message: "Figure not found" });
+      return;
+    }
+
     res.json(figure);
   } catch (e) {
     next(e);

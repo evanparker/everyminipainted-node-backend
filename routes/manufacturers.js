@@ -28,6 +28,12 @@ router.get("/:id", async (req, res, next) => {
     const manufacturer = await ManufacturerDAO.getManufacturerById(
       req.params.id
     );
+
+    if (!manufacturer) {
+      res.status(404).json({ message: "Manufacturer not found" });
+      return;
+    }
+
     res.json(manufacturer);
   } catch (e) {
     next(e);
