@@ -58,13 +58,13 @@ module.exports.createModerationReport = async (userId, reportObj) => {
   return ModerationReport.create({ userId, ...reportObj });
 };
 
-module.exports.getdModerationReport = async (id) => {
+module.exports.getModerationReport = async (id) => {
   return ModerationReport.findById(id)
     .populate([
       {
         path: "mini",
         options: { getDeleted: true },
-        populate: ["images", "userId"],
+        populate: ["images", "userId", "figure"],
         lean: true
       },
       "userId"
@@ -72,7 +72,7 @@ module.exports.getdModerationReport = async (id) => {
     .lean();
 };
 
-module.exports.getdAllModerationReports = async (queryParams) => {
+module.exports.getAllModerationReports = async (queryParams) => {
   if (queryParams.reportedUser) {
     return await getModerationReportsOnUser(queryParams.reportedUser);
   }

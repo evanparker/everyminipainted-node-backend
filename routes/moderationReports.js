@@ -7,7 +7,7 @@ const { isLoggedIn, isAdmin } = require("./middleware");
 
 router.get("/", async (req, res, next) => {
   try {
-    const reports = await ModerationReportDAO.getdAllModerationReports(
+    const reports = await ModerationReportDAO.getAllModerationReports(
       req.query
     );
     res.json(reports);
@@ -18,9 +18,7 @@ router.get("/", async (req, res, next) => {
 
 router.get("/:id", async (req, res, next) => {
   try {
-    const report = await ModerationReportDAO.getdModerationReport(
-      req.params.id
-    );
+    const report = await ModerationReportDAO.getModerationReport(req.params.id);
     res.json(report);
   } catch (e) {
     next(e);
