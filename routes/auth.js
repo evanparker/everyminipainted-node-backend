@@ -36,11 +36,14 @@ router.post("/signup", async (req, res, next) => {
     }
   } catch (e) {
     if (e.message.includes("duplicate key error collection")) {
-      if (e.message.includes("key: { email:")) {
+      if (e.message.includes("key: { username:")) {
+        res.status(409).send({ message: "Username already in use" });
+        return;
+      } else if (e.message.includes("key: { email:")) {
         res.status(409).send({ message: "Email already in use" });
         return;
-      } else if (e.message.includes("key: { username:")) {
-        res.status(409).send({ message: "Username already in use" });
+      } else {
+        res.status(409).send({ message: "Duplicate key error" });
         return;
       }
     }

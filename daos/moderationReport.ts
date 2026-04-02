@@ -1,11 +1,11 @@
-const { default: mongoose } = require("mongoose");
-const ModerationReport = require("../models/moderationReport");
-
-module.exports = {};
+import { Types } from "mongoose";
+import ModerationReport, {
+  IModerationReport
+} from "../models/moderationReport";
 
 const getModerationReports = async (
-  dbQuery = {},
-  queryParams = {},
+  dbQuery: { [key: string]: unknown } = {},
+  queryParams: { limit?: number; offset?: number; status?: string } = {},
   options = {}
 ) => {
   const limit = queryParams.limit === undefined ? 20 : queryParams.limit;
@@ -32,7 +32,7 @@ const getModerationReports = async (
   return result;
 };
 
-const getModerationReportsOnUser = async (userId) => {
+const getModerationReportsOnUser = async (userId: string) => {
   const reports = await ModerationReport.aggregate([
     {
       $lookup: {
@@ -47,48 +47,57 @@ const getModerationReportsOnUser = async (userId) => {
     },
     {
       $match: {
-        "mini.userId": new mongoose.Types.ObjectId(userId)
+        "mini.userId": new Types.ObjectId(userId)
       }
     }
   ]);
   return reports;
 };
 
-module.exports.createModerationReport = async (userId, reportObj) => {
+export async function createModerationReport(
+  userId: string,
+  reportObj: Partial<IModerationReport>
+) {
   return ModerationReport.create({ userId, ...reportObj });
-};
+}
 
-module.exports.getModerationReport = async (id) => {
+export async function getModerationReport(id: string) {
   return ModerationReport.findById(id)
     .populate([
       {
         path: "mini",
         options: { getDeleted: true },
-        populate: ["images", "userId", "figure"],
-        lean: true
+        populate: ["images", "userId", "figure"]
       },
       "userId"
     ])
     .lean();
-};
+}
 
-module.exports.getAllModerationReports = async (queryParams) => {
+export async function getAllModerationReports(queryParams: {
+  reportedUser?: string;
+  userId?: string;
+  status?: string;
+}) {
   if (queryParams.reportedUser) {
     return await getModerationReportsOnUser(queryParams.reportedUser);
   }
 
-  const dbQuery = {};
+  const dbQuery: { [key: string]: unknown } = {};
   if (queryParams?.userId) {
     dbQuery.userId = queryParams.userId;
-    delete queryParams.userid;
+    delete queryParams.userId;
   }
   if (queryParams?.status) {
     dbQuery.status = queryParams.status;
     delete queryParams.status;
   }
   return getModerationReports(dbQuery, queryParams);
-};
+}
 
-module.exports.updateModerationReport = async (id, reportObj) => {
+export async function updateModerationReport(
+  id: string,
+  reportObj: Partial<IModerationReport>
+) {
   return ModerationReport.findByIdAndUpdate(id, reportObj);
-};
+}

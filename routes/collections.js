@@ -1,6 +1,5 @@
 const { Router } = require("express");
 const router = Router();
-const FigureDAO = require("../daos/figure");
 const CollectionDAO = require("../daos/collection");
 const { isLoggedIn, isAdmin, skip } = require("./middleware");
 const { config } = require("../utils/config");

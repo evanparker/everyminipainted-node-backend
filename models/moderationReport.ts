@@ -1,14 +1,14 @@
-const mongoose = require("mongoose");
-const mongoosePaginate = require("mongoose-paginate-v2");
+import { InferSchemaType, model, PaginateModel, Schema } from "mongoose";
+import mongoosePaginate from "mongoose-paginate-v2";
 
-const moderationReportSchema = new mongoose.Schema({
+const moderationReportSchema = new Schema({
   userId: {
-    type: mongoose.Schema.Types.ObjectId,
+    type: Schema.Types.ObjectId,
     ref: "users",
     required: true
   },
   mini: {
-    type: mongoose.Schema.Types.ObjectId,
+    type: Schema.Types.ObjectId,
     ref: "minis",
     required: true
   },
@@ -42,4 +42,9 @@ const moderationReportSchema = new mongoose.Schema({
 
 moderationReportSchema.plugin(mongoosePaginate);
 
-module.exports = mongoose.model("moderationReports", moderationReportSchema);
+export type IModerationReport = InferSchemaType<typeof moderationReportSchema>;
+
+export default model<IModerationReport, PaginateModel<IModerationReport>>(
+  "moderationReports",
+  moderationReportSchema
+);

@@ -1,29 +1,34 @@
-const mongoose = require("mongoose");
-const reservedNames = require("../utils/reservedNames");
+import { InferSchemaType, Schema, model } from "mongoose";
+import reservedNames from "../utils/reservedNames";
 
-const userSchema = new mongoose.Schema({
+const userSchema = new Schema({
   username: {
     type: String,
     required: true,
     index: true,
-    unique: [true, "Username already in use"],
+    unique: true,
     immutable: true,
     trim: true,
     validate: [
       {
-        validator: (val) => {
+        validator: (val: string): boolean => {
+          if (!val) return false;
           return !reservedNames.includes(val);
         },
         message: "Username already in use"
       },
       {
-        validator: (val) => {
+        validator: (val: string): boolean => {
+          if (!val) return false;
           return val.length >= 3 && val.length <= 30;
         },
         message: "Username must be between 3 and 30 characters"
       },
       {
-        validator: /^[a-z0-9-_]+$/,
+        validator: (val: string): boolean => {
+          if (!val) return false;
+          return /^[a-z0-9-_]+$/.test(val);
+        },
         message:
           "Username must consist of only lowercase characters, numbers, dashes, and underscores"
       }
@@ -33,11 +38,13 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
     index: true,
-    unique: [true, "Email must be unique"],
+    unique: true,
     immutable: true,
     validate: [
       {
-        validator: /^[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,}$/,
+        validator: (val: string): boolean => {
+          return /^[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,}$/.test(val);
+        },
         message: "Must be a valid email address"
       }
     ],
@@ -45,7 +52,7 @@ const userSchema = new mongoose.Schema({
   },
   password: { type: String, required: true },
   roles: { type: [String], required: true },
-  avatar: { type: mongoose.Schema.Types.ObjectId, ref: "images" },
+  avatar: { type: Schema.Types.ObjectId, ref: "images" },
   website: { type: String },
   description: { type: String },
   socials: [
@@ -56,7 +63,7 @@ const userSchema = new mongoose.Schema({
   ],
   favorites: {
     type: Map,
-    of: mongoose.Schema.Types.ObjectId,
+    of: Schema.Types.ObjectId,
     ref: "minis",
     default: {}
   },
@@ -68,7 +75,9 @@ const userSchema = new mongoose.Schema({
   }
 });
 
-module.exports = mongoose.model("users", userSchema);
+export type IUser = InferSchemaType<typeof userSchema>;
+
+export default model("users", userSchema);
 
 // userSchema.pre("save", async function (next) {
 //   const bcryptSalt = Number(process.env.BCRYPT_SALT);

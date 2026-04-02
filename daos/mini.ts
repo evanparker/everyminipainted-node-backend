@@ -1,9 +1,10 @@
-const mongoose = require("mongoose");
-const Mini = require("../models/mini");
+import Mini, { IMini } from "../models/mini";
 
-module.exports = {};
-
-const getMinis = async (dbQuery = {}, queryParams = {}, options = {}) => {
+const getMinis = async (
+  dbQuery = {},
+  queryParams: { limit?: number; offset?: number } = {},
+  options = {}
+) => {
   const limit = queryParams.limit === undefined ? 20 : queryParams.limit;
   const offset = queryParams.offset === undefined ? 0 : queryParams.offset;
 
@@ -22,49 +23,52 @@ const getMinis = async (dbQuery = {}, queryParams = {}, options = {}) => {
   return result;
 };
 
-module.exports.getAllMinis = async (queryParams = {}) => {
+export async function getAllMinis(queryParams = {}) {
   return getMinis({}, queryParams);
-};
+}
 
-module.exports.getMinisBySearch = async (queryParams) => {
+export async function getMinisBySearch(queryParams: {
+  limit?: number;
+  offset?: number;
+  search: string;
+}) {
   return getMinis(
     { name: { $regex: queryParams.search, $options: "i" }, isDeleted: false },
     queryParams,
     { sort: { name: 1 } }
   );
-};
+}
 
-module.exports.getMiniById = async (id) => {
+export async function getMiniById(id: string) {
   let mini = await Mini.findById(id)
     .lean()
-    .populate({ path: "figure", lean: true })
+    .populate({ path: "figure" })
     .populate({
       path: "userId",
-      lean: true,
-      populate: { path: "avatar", lean: true }
+      populate: { path: "avatar" }
     })
-    .populate({ path: "images", lean: true })
-    .populate({ path: "thumbnail", lean: true });
+    .populate({ path: "images" })
+    .populate({ path: "thumbnail" });
 
   return mini;
-};
+}
 
-module.exports.getMinisByUserId = async (userId, queryParams = {}) => {
+export async function getMinisByUserId(userId: string, queryParams = {}) {
   return getMinis({ userId }, queryParams);
-};
+}
 
-module.exports.getMinisByFigureId = async (figureId, queryParams = {}) => {
+export async function getMinisByFigureId(figureId: string, queryParams = {}) {
   return getMinis({ figure: figureId }, queryParams);
-};
+}
 
-module.exports.createMini = async (miniObj) => {
+export async function createMini(miniObj: IMini) {
   return await Mini.create(miniObj);
-};
+}
 
-module.exports.updateMini = async (id, miniObj) => {
+export async function updateMini(id: string, miniObj: Partial<IMini>) {
   return await Mini.findOneAndUpdate({ _id: id }, miniObj, { new: true });
-};
+}
 
-module.exports.deleteMini = async (id) => {
+export async function deleteMini(id: string) {
   return await Mini.findOneAndUpdate({ _id: id }, { isDeleted: true });
-};
+}

@@ -1,9 +1,8 @@
-const server = require("./server");
-const mongoose = require("mongoose");
-const dotenv = require("dotenv").config();
+import server from "./server";
+import mongoose from "mongoose";
 
-const port = process.env.PORT || 3001;
-const mongoURL =
+const port: number = parseInt(process.env.PORT) || 3001;
+const mongoURL: string =
   process.env.DB_URL || "mongodb://127.0.0.1/every-mini-painted-cloudinary";
 
 mongoose.connect(mongoURL, {}).then(() => {

@@ -3,9 +3,9 @@ const request = require("supertest");
 const server = require("../server");
 const testUtils = require("../test-utils");
 
-const User = require("../models/user");
-const Image = require("../models/image");
-const Invite = require("../models/invite");
+const User = require("../models/user").default;
+const Image = require("../models/image").default;
+const Invite = require("../models/invite").default;
 
 describe("/invites", () => {
   beforeAll(testUtils.connectDB);

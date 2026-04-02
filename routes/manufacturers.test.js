@@ -3,10 +3,10 @@ const request = require("supertest");
 const server = require("../server");
 const testUtils = require("../test-utils");
 
-const User = require("../models/user");
-const Image = require("../models/image");
-const Manufacturer = require("../models/manufacturer");
-const Invite = require("../models/invite");
+const User = require("../models/user").default;
+const Image = require("../models/image").default;
+const Manufacturer = require("../models/manufacturer").default;
+const Invite = require("../models/invite").default;
 
 // this breaks such that no values are loaded from the .env file...
 // still figuring out how to get it to replace values in tests.

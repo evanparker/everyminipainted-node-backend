@@ -3,9 +3,9 @@ const request = require("supertest");
 const server = require("../server");
 const testUtils = require("../test-utils");
 
-const User = require("../models/user");
-const Invite = require("../models/invite");
-const PasswordToken = require("../models/passwordToken");
+const User = require("../models/user").default;
+const Invite = require("../models/invite").default;
+const PasswordToken = require("../models/passwordToken").default;
 const crypto = require("crypto");
 const bcrypt = require("bcrypt");
 

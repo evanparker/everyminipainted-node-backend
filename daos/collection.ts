@@ -1,9 +1,10 @@
-const mongoose = require("mongoose");
-const Collection = require("../models/collection");
+import Collection, { ICollection } from "../models/collection";
 
-module.exports = {};
-
-const getCollections = async (dbQuery = {}, queryParams = {}, options = {}) => {
+const getCollections = async (
+  dbQuery = {},
+  queryParams: { limit?: number; offset?: number } = {},
+  options = {}
+) => {
   const limit = queryParams.limit === undefined ? 20 : queryParams.limit;
   const offset = queryParams.offset === undefined ? 0 : queryParams.offset;
 
@@ -19,33 +20,35 @@ const getCollections = async (dbQuery = {}, queryParams = {}, options = {}) => {
   return result;
 };
 
-module.exports.getAllCollections = async (queryParams = {}) => {
+export async function getAllCollections(queryParams = {}) {
   return getCollections({}, queryParams);
-};
+}
 
-module.exports.getCollectionById = async (id) => {
+export async function getCollectionById(id: string) {
   const collection = await Collection.findById(id)
     .lean()
-    .populate({ path: "manufacturer", lean: true })
-    .populate({ path: "images", lean: true })
-    .populate({ path: "thumbnail", lean: true })
+    .populate({ path: "manufacturer" })
+    .populate({ path: "images" })
+    .populate({ path: "thumbnail" })
     .populate({
       path: "figures",
-      lean: true,
-      populate: { path: "thumbnail", lean: true }
+      populate: { path: "thumbnail" }
     });
   return collection;
-};
+}
 
-module.exports.getCollectionsIncludingFigure = async (id, queryParams) => {
+export async function getCollectionsIncludingFigure(
+  id: string,
+  queryParams: any = {}
+) {
   const collections = await getCollections(
     { figures: { $in: id } },
     queryParams
   );
   return collections;
-};
+}
 
-module.exports.getCollectionsBySearch = async (queryParams = {}) => {
+export async function getCollectionsBySearch(queryParams: any = {}) {
   return getCollections(
     {
       $and: [
@@ -63,29 +66,32 @@ module.exports.getCollectionsBySearch = async (queryParams = {}) => {
     queryParams,
     { sort: { name: 1 } }
   );
-};
+}
 
-module.exports.createCollection = async (obj) => {
+export async function createCollection(obj: ICollection) {
   return await Collection.create(obj);
-};
+}
 
-module.exports.updateCollection = async (id, obj) => {
+export async function updateCollection(id: string, obj: Partial<ICollection>) {
   return await Collection.updateOne({ _id: id }, obj, { new: true });
-};
+}
 
-module.exports.findAndUpdateCollection = async (filter, obj) => {
+export async function findAndUpdateCollection(
+  filter: any,
+  obj: Partial<ICollection>
+) {
   return await Collection.findOneAndUpdate(filter, obj, {
     new: true
   });
-};
+}
 
-module.exports.upsertCollection = async (filter, obj) => {
+export async function upsertCollection(filter: any, obj: Partial<ICollection>) {
   return await Collection.findOneAndUpdate(filter, obj, {
     new: true,
     upsert: true // Make this update into an upsert
   });
-};
+}
 
-module.exports.deleteCollection = async (id) => {
+export async function deleteCollection(id: string) {
   return await Collection.findOneAndDelete({ _id: id });
-};
+}

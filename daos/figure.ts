@@ -1,9 +1,10 @@
-const mongoose = require("mongoose");
-const Figure = require("../models/figure");
+import Figure, { IFigure } from "../models/figure";
 
-module.exports = {};
-
-const getFigures = async (dbQuery = {}, queryParams = {}, options = {}) => {
+const getFigures = async (
+  dbQuery = {},
+  queryParams: { limit?: number; offset?: number } = {},
+  options = {}
+) => {
   const limit = queryParams.limit === undefined ? 20 : queryParams.limit;
   const offset = queryParams.offset === undefined ? 0 : queryParams.offset;
 
@@ -19,20 +20,27 @@ const getFigures = async (dbQuery = {}, queryParams = {}, options = {}) => {
   return result;
 };
 
-module.exports.getAllFigures = async (queryParams = {}) => {
+export async function getAllFigures(queryParams = {}) {
   return getFigures({}, queryParams);
-};
+}
 
-module.exports.getFigureById = async (id) => {
+export async function getFigureById(id: string) {
   const figure = await Figure.findById(id)
     .lean()
-    .populate({ path: "manufacturer", lean: true })
-    .populate({ path: "images", lean: true })
-    .populate({ path: "thumbnail", lean: true });
+    .populate({ path: "manufacturer" })
+    .populate({ path: "images" })
+    .populate({ path: "thumbnail" });
   return figure;
-};
+}
 
-module.exports.getFiguresBySearch = async (queryParams = {}) => {
+export async function getFiguresBySearch(
+  queryParams: {
+    limit?: number;
+    offset?: number;
+    search?: string;
+    manufacturer?: string;
+  } = {}
+) {
   return getFigures(
     {
       $and: [
@@ -50,36 +58,42 @@ module.exports.getFiguresBySearch = async (queryParams = {}) => {
     queryParams,
     { sort: { name: 1 } }
   );
-};
+}
 
-module.exports.getFiguresBymanufacturerId = async (
-  manufacturerId,
+export async function getFiguresBymanufacturerId(
+  manufacturerId: string,
   queryParams = {}
-) => {
+) {
   return getFigures({ manufacturer: manufacturerId }, queryParams);
-};
+}
 
-module.exports.createFigure = async (obj) => {
+export async function createFigure(obj: IFigure) {
   return await Figure.create(obj);
-};
+}
 
-module.exports.updateFigure = async (id, obj) => {
+export async function updateFigure(id: string, obj: Partial<IFigure>) {
   return await Figure.updateOne({ _id: id }, obj, { new: true });
-};
+}
 
-module.exports.findAndUpdateFigure = async (filter, obj) => {
+export async function findAndUpdateFigure(
+  filter: Record<string, unknown>,
+  obj: Partial<IFigure>
+) {
   return await Figure.findOneAndUpdate(filter, obj, {
     new: true
   });
-};
+}
 
-module.exports.upsertFigure = async (filter, obj) => {
+export async function upsertFigure(
+  filter: Record<string, unknown>,
+  obj: Partial<IFigure>
+) {
   return await Figure.findOneAndUpdate(filter, obj, {
     new: true,
     upsert: true // Make this update into an upsert
   });
-};
+}
 
-module.exports.deleteFigure = async (id) => {
+export async function deleteFigure(id: string) {
   return await Figure.findOneAndDelete({ _id: id });
-};
+}

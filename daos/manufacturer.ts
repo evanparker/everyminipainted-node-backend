@@ -1,11 +1,8 @@
-const mongoose = require("mongoose");
-const Manufacturer = require("../models/manufacturer");
-
-module.exports = {};
+import Manufacturer, { IManufacturer } from "../models/manufacturer";
 
 const getManufacturers = async (
   dbQuery = {},
-  queryParams = {},
+  queryParams: { limit?: number; offset?: number } = {},
   options = {}
 ) => {
   const limit = queryParams.limit === undefined ? 20 : queryParams.limit;
@@ -23,34 +20,43 @@ const getManufacturers = async (
   return result;
 };
 
-module.exports.getAllManufacturers = async (queryParams) => {
+export async function getAllManufacturers(
+  queryParams: { limit?: number; offset?: number } = {}
+) {
   return getManufacturers({}, queryParams);
-};
+}
 
-module.exports.getManufacturerById = async (id) => {
+export async function getManufacturerById(id: string) {
   const manufacturer = await Manufacturer.findById(id)
     .lean()
-    .populate({ path: "images", lean: true })
-    .populate({ path: "thumbnail", lean: true });
+    .populate({ path: "images" })
+    .populate({ path: "thumbnail" });
   return manufacturer;
-};
+}
 
-module.exports.getManufacturersBySearch = async (queryParams) => {
+export async function getManufacturersBySearch(queryParams: {
+  limit?: number;
+  offset?: number;
+  search: string;
+}) {
   return getManufacturers(
     { name: { $regex: queryParams.search, $options: "i" } },
     queryParams,
     { sort: { name: 1 } }
   );
-};
+}
 
-module.exports.createManufacturer = async (obj) => {
+export async function createManufacturer(obj: IManufacturer) {
   return await Manufacturer.create(obj);
-};
+}
 
-module.exports.updateManufacturer = async (id, obj) => {
+export async function updateManufacturer(
+  id: string,
+  obj: Partial<IManufacturer>
+) {
   return await Manufacturer.updateOne({ _id: id }, obj, { new: true });
-};
+}
 
-module.exports.deleteManufacturer = async (id) => {
+export async function deleteManufacturer(id: string) {
   return await Manufacturer.findOneAndDelete({ _id: id });
-};
+}

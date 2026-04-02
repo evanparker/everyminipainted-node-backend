@@ -1,13 +1,13 @@
 const mongoose = require("mongoose");
 const models = [
-  require("./models/user"),
-  require("./models/image"),
-  require("./models/token"),
-  require("./models/mini"),
-  require("./models/manufacturer"),
-  require("./models/figure"),
-  require("./models/invite"),
-  require("./models/passwordToken"),
+  require("./models/user").default,
+  require("./models/image").default,
+  require("./models/token").default,
+  require("./models/mini").default,
+  require("./models/manufacturer").default,
+  require("./models/figure").default,
+  require("./models/invite").default,
+  require("./models/passwordToken").default,
   require("./models/moderationReport")
 ];
 
