@@ -55,7 +55,7 @@ const getModerationReportsOnUser = async (userId: string) => {
 };
 
 export async function createModerationReport(
-  userId: string,
+  userId: string | undefined | Types.ObjectId,
   reportObj: Partial<IModerationReport>
 ) {
   return ModerationReport.create({ userId, ...reportObj });

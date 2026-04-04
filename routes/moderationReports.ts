@@ -1,15 +1,16 @@
-const { Router } = require("express");
+import { Router } from "express";
+import {
+  createModerationReport,
+  getAllModerationReports,
+  getModerationReport,
+  updateModerationReport
+} from "../daos/moderationReport";
+import { isAdmin, isLoggedIn } from "./middleware";
 const router = Router();
-const MiniDAO = require("../daos/mini");
-const ModerationReportDAO = require("../daos/moderationReport");
-const UserDAO = require("../daos/user");
-const { isLoggedIn, isAdmin } = require("./middleware");
 
 router.get("/", async (req, res, next) => {
   try {
-    const reports = await ModerationReportDAO.getAllModerationReports(
-      req.query
-    );
+    const reports = await getAllModerationReports(req.query);
     res.json(reports);
   } catch (e) {
     next(e);
@@ -18,7 +19,7 @@ router.get("/", async (req, res, next) => {
 
 router.get("/:id", async (req, res, next) => {
   try {
-    const report = await ModerationReportDAO.getModerationReport(req.params.id);
+    const report = await getModerationReport(req.params.id);
     res.json(report);
   } catch (e) {
     next(e);
@@ -27,10 +28,7 @@ router.get("/:id", async (req, res, next) => {
 
 router.post("/", isLoggedIn, async (req, res, next) => {
   try {
-    const report = await ModerationReportDAO.createModerationReport(
-      req.userId,
-      req.body
-    );
+    const report = await createModerationReport(req.userId, req.body);
     res.json(report);
   } catch (e) {
     next(e);
@@ -39,10 +37,13 @@ router.post("/", isLoggedIn, async (req, res, next) => {
 
 router.put("/:id", isLoggedIn, isAdmin, async (req, res, next) => {
   try {
-    const report = await ModerationReportDAO.updateModerationReport(
-      req.params.id,
-      req.body
-    );
+    let id: string;
+    if (Array.isArray(req.params.id)) {
+      id = req.params.id[0];
+    } else {
+      id = req.params.id;
+    }
+    const report = await updateModerationReport(id, req.body);
     res.json(report);
   } catch (e) {
     next(e);
@@ -57,4 +58,4 @@ router.put("/:id", isLoggedIn, isAdmin, async (req, res, next) => {
 //   }
 // });
 
-module.exports = router;
+export default router;

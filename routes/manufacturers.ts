@@ -1,13 +1,20 @@
-const { Router } = require("express");
+import { Router } from "express";
+import { getFiguresBymanufacturerId } from "../daos/figure";
+import {
+  createManufacturer,
+  deleteManufacturer,
+  getAllManufacturers,
+  getManufacturerById,
+  getManufacturersBySearch,
+  updateManufacturer
+} from "../daos/manufacturer";
+import { config } from "../utils/config";
+import { isAdmin, isLoggedIn, skip } from "./middleware";
 const router = Router();
-const FigureDAO = require("../daos/figure");
-const ManufacturerDAO = require("../daos/manufacturer");
-const { isLoggedIn, isAdmin, skip } = require("./middleware");
-const { config } = require("../utils/config");
 
 router.get("/", async (req, res, next) => {
   try {
-    const results = await ManufacturerDAO.getAllManufacturers(req.query);
+    const results = await getAllManufacturers(req.query);
     res.json(results);
   } catch (e) {
     next(e);
@@ -16,7 +23,7 @@ router.get("/", async (req, res, next) => {
 
 router.get("/search", async (req, res, next) => {
   try {
-    const results = await ManufacturerDAO.getManufacturersBySearch(req.query);
+    const results = await getManufacturersBySearch(req.query);
     res.json(results);
   } catch (e) {
     next(e);
@@ -25,9 +32,7 @@ router.get("/search", async (req, res, next) => {
 
 router.get("/:id", async (req, res, next) => {
   try {
-    const manufacturer = await ManufacturerDAO.getManufacturerById(
-      req.params.id
-    );
+    const manufacturer = await getManufacturerById(req.params.id);
 
     if (!manufacturer) {
       res.status(404).json({ message: "Manufacturer not found" });
@@ -42,10 +47,7 @@ router.get("/:id", async (req, res, next) => {
 
 router.get("/:id/figures", async (req, res, next) => {
   try {
-    const results = await FigureDAO.getFiguresBymanufacturerId(
-      req.params.id,
-      req.query
-    );
+    const results = await getFiguresBymanufacturerId(req.params.id, req.query);
     res.json(results);
   } catch (e) {
     next(e);
@@ -58,7 +60,7 @@ router.post(
   config.features.editManufacturerRequiresAdmin ? isAdmin : skip,
   async (req, res, next) => {
     try {
-      const manufacturer = await ManufacturerDAO.createManufacturer(req.body);
+      const manufacturer = await createManufacturer(req.body);
       res.json(manufacturer);
     } catch (e) {
       next(e);
@@ -72,10 +74,13 @@ router.put(
   config.features.editManufacturerRequiresAdmin ? isAdmin : skip,
   async (req, res, next) => {
     try {
-      const updatedManufacturer = await ManufacturerDAO.updateManufacturer(
-        req.params.id,
-        req.body
-      );
+      let id: string;
+      if (Array.isArray(req.params.id)) {
+        id = req.params.id[0];
+      } else {
+        id = req.params.id;
+      }
+      const updatedManufacturer = await updateManufacturer(id, req.body);
       res.json(updatedManufacturer);
     } catch (e) {
       next(e);
@@ -89,9 +94,13 @@ router.delete(
   config.features.editManufacturerRequiresAdmin ? isAdmin : skip,
   async (req, res, next) => {
     try {
-      const deletedManufacturer = await ManufacturerDAO.deleteManufacturer(
-        req.params.id
-      );
+      let id: string;
+      if (Array.isArray(req.params.id)) {
+        id = req.params.id[0];
+      } else {
+        id = req.params.id;
+      }
+      const deletedManufacturer = await deleteManufacturer(id);
       res.json(deletedManufacturer);
     } catch (e) {
       next(e);
@@ -99,4 +108,4 @@ router.delete(
   }
 );
 
-module.exports = router;
+export default router;

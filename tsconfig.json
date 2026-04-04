@@ -18,7 +18,9 @@
     // Disallow features that require cross-file awareness
     "isolatedModules": true,
 
-    "outDir": "./dist"
+    "outDir": "./dist",
+
+    "types": ["node", "Multer"]
   },
   "include": ["./**/*"],
   "exclude": [
@@ -29,5 +31,6 @@
     "data",
     "tests",
     "postman"
-  ]
+  ],
+  "typeRoots": ["index.d.ts"]
 }

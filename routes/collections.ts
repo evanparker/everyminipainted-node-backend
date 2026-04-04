@@ -1,12 +1,20 @@
-const { Router } = require("express");
+import { Router } from "express";
+import {
+  createCollection,
+  deleteCollection,
+  getAllCollections,
+  getCollectionById,
+  getCollectionsBySearch,
+  getCollectionsIncludingFigure,
+  updateCollection
+} from "../daos/collection";
+import { config } from "../utils/config";
+import { isAdmin, isLoggedIn, skip } from "./middleware";
 const router = Router();
-const CollectionDAO = require("../daos/collection");
-const { isLoggedIn, isAdmin, skip } = require("./middleware");
-const { config } = require("../utils/config");
 
 router.get("/", async (req, res, next) => {
   try {
-    const collections = await CollectionDAO.getAllCollections(req.query);
+    const collections = await getAllCollections(req.query);
     res.json(collections);
   } catch (e) {
     next(e);
@@ -15,7 +23,7 @@ router.get("/", async (req, res, next) => {
 
 router.get("/search", async (req, res, next) => {
   try {
-    const collections = await CollectionDAO.getCollectionsBySearch(req.query);
+    const collections = await getCollectionsBySearch(req.query);
     res.json(collections);
   } catch (e) {
     next(e);
@@ -24,7 +32,7 @@ router.get("/search", async (req, res, next) => {
 
 router.get("/figure/:figureId", async (req, res, next) => {
   try {
-    const collection = await CollectionDAO.getCollectionsIncludingFigure(
+    const collection = await getCollectionsIncludingFigure(
       req.params.figureId,
       req.query
     );
@@ -36,7 +44,7 @@ router.get("/figure/:figureId", async (req, res, next) => {
 
 router.get("/:id", async (req, res, next) => {
   try {
-    const collection = await CollectionDAO.getCollectionById(req.params.id);
+    const collection = await getCollectionById(req.params.id);
 
     if (!collection) {
       res.status(404).json({ message: "Collection not found" });
@@ -55,7 +63,7 @@ router.post(
   config.features.editCollectionRequiresAdmin ? isAdmin : skip,
   async (req, res, next) => {
     try {
-      const collection = await CollectionDAO.createCollection(req.body);
+      const collection = await createCollection(req.body);
       res.json(collection);
     } catch (e) {
       next(e);
@@ -69,10 +77,13 @@ router.put(
   config.features.editCollectionRequiresAdmin ? isAdmin : skip,
   async (req, res, next) => {
     try {
-      const updatedCollection = await CollectionDAO.updateCollection(
-        req.params.id,
-        req.body
-      );
+      let id: string;
+      if (Array.isArray(req.params.id)) {
+        id = req.params.id[0];
+      } else {
+        id = req.params.id;
+      }
+      const updatedCollection = await updateCollection(id, req.body);
       res.json(updatedCollection);
     } catch (e) {
       next(e);
@@ -86,9 +97,13 @@ router.delete(
   config.features.editCollectionRequiresAdmin ? isAdmin : skip,
   async (req, res, next) => {
     try {
-      const deletedCollection = await CollectionDAO.deleteCollection(
-        req.params.id
-      );
+      let id: string;
+      if (Array.isArray(req.params.id)) {
+        id = req.params.id[0];
+      } else {
+        id = req.params.id;
+      }
+      const deletedCollection = await deleteCollection(id);
       res.json(deletedCollection);
     } catch (e) {
       next(e);
@@ -96,4 +111,4 @@ router.delete(
   }
 );
 
-module.exports = router;
+export default router;

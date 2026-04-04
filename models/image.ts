@@ -1,4 +1,4 @@
-import { Schema, model } from "mongoose";
+import { InferSchemaType, Schema, model } from "mongoose";
 
 const imageSchema = new Schema({
   userId: {
@@ -19,5 +19,7 @@ const imageSchema = new Schema({
     index: true
   }
 });
+
+export type IImage = InferSchemaType<typeof imageSchema>;
 
 export default model("images", imageSchema);

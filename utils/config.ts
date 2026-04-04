@@ -1,9 +1,8 @@
-const dotenv = require("dotenv");
-const { toBool } = require("./toBool");
-dotenv.config();
+import { config as dotenvConfig } from "dotenv";
+import { toBool } from "./toBool";
+dotenvConfig();
 
-module.exports = {};
-module.exports.config = {
+export const config = {
   aws: {
     bucket: process.env["AWS_S3_BUCKET"],
     region: process.env["AWS_REGION"],

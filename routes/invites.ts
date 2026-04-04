@@ -1,12 +1,17 @@
-const { Router } = require("express");
+import { Router } from "express";
+import {
+  createInvite,
+  deleteInvite,
+  getAllInvites,
+  getInviteByCode
+} from "../daos/invite";
+import { isAdmin, isLoggedIn } from "./middleware";
 const router = Router();
-const InviteDAO = require("../daos/invite");
-const { isLoggedIn, isAdmin } = require("./middleware");
 
 router.post("/", isLoggedIn, isAdmin, async (req, res, next) => {
   try {
     const inviteObj = req.body;
-    const invite = await InviteDAO.createInvite(inviteObj);
+    const invite = await createInvite(inviteObj);
     res.json(invite);
   } catch (e) {
     next(e);
@@ -15,7 +20,7 @@ router.post("/", isLoggedIn, isAdmin, async (req, res, next) => {
 
 router.get("/", async (req, res, next) => {
   try {
-    const invites = await InviteDAO.getAllInvites();
+    const invites = await getAllInvites();
     res.json(invites);
   } catch (e) {
     next(e);
@@ -24,7 +29,7 @@ router.get("/", async (req, res, next) => {
 
 router.get("/:code", async (req, res, next) => {
   try {
-    const invite = await InviteDAO.getInviteByCode(req.params.code);
+    const invite = await getInviteByCode(req.params.code);
     if (!invite) {
       res.status(404).json({ message: "Invite code not found" });
       return;
@@ -37,7 +42,13 @@ router.get("/:code", async (req, res, next) => {
 
 router.delete("/:code", isLoggedIn, isAdmin, async (req, res, next) => {
   try {
-    const invite = await InviteDAO.deleteInvite(req.params.code);
+    let code: string;
+    if (Array.isArray(req.params.code)) {
+      code = req.params.code[0];
+    } else {
+      code = req.params.code;
+    }
+    const invite = await deleteInvite(code);
     if (!invite) {
       res.status(404).json({ message: "Invite code not found" });
       return;
@@ -48,4 +59,4 @@ router.delete("/:code", isLoggedIn, isAdmin, async (req, res, next) => {
   }
 });
 
-module.exports = router;
+export default router;

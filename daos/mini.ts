@@ -1,3 +1,4 @@
+import { Types } from "mongoose";
 import Mini, { IMini } from "../models/mini";
 
 const getMinis = async (
@@ -30,7 +31,7 @@ export async function getAllMinis(queryParams = {}) {
 export async function getMinisBySearch(queryParams: {
   limit?: number;
   offset?: number;
-  search: string;
+  search?: string;
 }) {
   return getMinis(
     { name: { $regex: queryParams.search, $options: "i" }, isDeleted: false },
@@ -53,11 +54,17 @@ export async function getMiniById(id: string) {
   return mini;
 }
 
-export async function getMinisByUserId(userId: string, queryParams = {}) {
+export async function getMinisByUserId(
+  userId: string | Types.ObjectId,
+  queryParams = {}
+) {
   return getMinis({ userId }, queryParams);
 }
 
-export async function getMinisByFigureId(figureId: string, queryParams = {}) {
+export async function getMinisByFigureId(
+  figureId: string | Types.ObjectId,
+  queryParams = {}
+) {
   return getMinis({ figure: figureId }, queryParams);
 }
 

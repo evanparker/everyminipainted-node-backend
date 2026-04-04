@@ -37,7 +37,7 @@ export async function getManufacturerById(id: string) {
 export async function getManufacturersBySearch(queryParams: {
   limit?: number;
   offset?: number;
-  search: string;
+  search?: string;
 }) {
   return getManufacturers(
     { name: { $regex: queryParams.search, $options: "i" } },
