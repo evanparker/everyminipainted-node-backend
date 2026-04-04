@@ -1,21 +1,29 @@
-const {
+import {
   PutObjectCommand,
   S3Client,
+  S3ClientConfig,
   S3ServiceException
-} = require("@aws-sdk/client-s3");
-const { config } = require("../config");
-
-module.exports = {};
+} from "@aws-sdk/client-s3";
+import { config } from "../config";
 
 /**
  * Upload a file to an S3 bucket.
  * @param {{ bucketName: string, key: string, data: any }}
  */
-module.exports.UploadFile = async ({ bucketName, key, data }) => {
+export async function UploadFile({
+  bucketName,
+  key,
+  data
+}: {
+  bucketName: string;
+  key: string;
+  data: any;
+}) {
   const client = new S3Client({
     accessKeyId: config.aws.accessKey,
     secretAccessKey: config.aws.secretKey
-  });
+  } as S3ClientConfig);
+
   const command = new PutObjectCommand({
     Bucket: bucketName,
     Key: key,
@@ -43,4 +51,4 @@ or the multipart upload API (5TB max).`
       throw caught;
     }
   }
-};
+}

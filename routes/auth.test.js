@@ -9,7 +9,7 @@ const PasswordToken = require("../models/passwordToken").default;
 const crypto = require("crypto");
 const bcrypt = require("bcrypt");
 
-const sendEmail = require("../utils/email/sendEmail");
+const sendEmail = require("../utils/email/sendEmail").default;
 jest.mock("../utils/email/sendEmail");
 
 const bcryptSalt = Number(process.env.BCRYPT_SALT);

@@ -8,7 +8,7 @@ const models = [
   require("./models/figure").default,
   require("./models/invite").default,
   require("./models/passwordToken").default,
-  require("./models/moderationReport")
+  require("./models/moderationReport").default
 ];
 
 module.exports = {};
