@@ -29,9 +29,7 @@ collectionSchema.plugin(mongoosePaginate);
 
 export type ICollection = InferSchemaType<typeof collectionSchema>;
 
-const Collection = model<ICollection, PaginateModel<ICollection>>(
+export default model<ICollection, PaginateModel<ICollection>>(
   "collections",
   collectionSchema
 );
-
-export default Collection;
