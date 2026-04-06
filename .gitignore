@@ -137,3 +137,6 @@ data/*
 # Postman
 postman
 postman/*
+
+# Ignore files with .ignore extension
+*.ignore

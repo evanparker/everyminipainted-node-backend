@@ -1,4 +1,4 @@
-import { InferSchemaType, Schema, model } from "mongoose";
+import mongoose, { InferSchemaType, Schema, model } from "mongoose";
 import reservedNames from "../utils/reservedNames";
 
 const userSchema = new Schema({
@@ -75,7 +75,9 @@ const userSchema = new Schema({
   }
 });
 
-export type IUser = InferSchemaType<typeof userSchema>;
+export type IUser = InferSchemaType<typeof userSchema> & {
+  _id?: mongoose.Types.ObjectId;
+};
 
 export default model("users", userSchema);
 

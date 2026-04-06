@@ -14,7 +14,8 @@ const models = [
 module.exports = {};
 
 module.exports.connectDB = async () => {
-  await mongoose.connect(process.env.MONGO_URL, {});
+  console.log("Connecting to MongoDB...", process.env.DB_URL);
+  await mongoose.connect(process.env.DB_URL || "mongodb://127.0.0.1/test", {});
   await Promise.all(models.map((m) => m.syncIndexes()));
 };
 

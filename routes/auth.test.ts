@@ -1,26 +1,33 @@
-const request = require("supertest");
+import {
+  afterAll,
+  afterEach,
+  beforeAll,
+  beforeEach,
+  describe,
+  expect,
+  jest,
+  test
+} from "@jest/globals";
+import bcrypt from "bcrypt";
+import crypto from "crypto";
+import request from "supertest";
+import Invite from "../models/invite";
+import PasswordToken from "../models/passwordToken";
+import User, { IUser } from "../models/user";
+import server from "../server";
+import testUtils from "../test-utils";
+import sendEmail from "../utils/email/sendEmail";
 
-const server = require("../server");
-const testUtils = require("../test-utils");
-
-const User = require("../models/user").default;
-const Invite = require("../models/invite").default;
-const PasswordToken = require("../models/passwordToken").default;
-const crypto = require("crypto");
-const bcrypt = require("bcrypt");
-
-const sendEmail = require("../utils/email/sendEmail").default;
 jest.mock("../utils/email/sendEmail");
 
 const bcryptSalt = Number(process.env.BCRYPT_SALT);
 
-describe("/auth", () => {
+describe("Auth Routes /auth", () => {
   beforeAll(testUtils.connectDB);
   afterAll(testUtils.stopDB);
-
   afterEach(testUtils.clearDB);
 
-  const invite = {
+  const invite0 = {
     code: "inviteCode"
   };
   const invite1 = {
@@ -37,23 +44,23 @@ describe("/auth", () => {
     password: "456password"
   };
 
-  describe("before signup", () => {
-    describe("POST /", () => {
-      it("should return 401", async () => {
+  describe("Before Signup... ", () => {
+    describe("POST /login", () => {
+      test("should return 401 for invalid login", async () => {
         const res = await request(server).post("/auth/login").send(user0);
         expect(res.statusCode).toEqual(401);
       });
     });
 
     describe("PUT /password", () => {
-      it("should return 401", async () => {
+      test("should return 401 for invalid password", async () => {
         const res = await request(server).put("/auth/password").send(user0);
         expect(res.statusCode).toEqual(401);
       });
     });
 
     describe("POST /forgotpassword", () => {
-      it("should return a 404", async () => {
+      test("should return 404 for non-existent email", async () => {
         const res = await request(server)
           .post("/auth/forgotpassword")
           .send(user0);
@@ -62,42 +69,42 @@ describe("/auth", () => {
     });
 
     describe("POST /logout", () => {
-      it("should return 401", async () => {
+      test("should return 401 for unauthenticated user", async () => {
         const res = await request(server).post("/auth/logout").send();
         expect(res.statusCode).toEqual(401);
       });
     });
   });
 
-  describe("signup", () => {
+  describe("Signup...", () => {
     describe("POST /signup", () => {
       beforeEach(async () => {
-        await Invite.create(invite);
+        await Invite.create(invite0);
         await Invite.create(invite1);
       });
-      it("should return 400 without a password", async () => {
+      test("should return 400 without a password", async () => {
         const res = await request(server).post("/auth/signup").send({
-          invite: invite.code,
+          invite: invite0.code,
           email: user0.email
         });
         expect(res.statusCode).toEqual(400);
       });
-      it("should return 400 with empty password", async () => {
+      test("should return 400 with empty password", async () => {
         const res = await request(server).post("/auth/signup").send({
-          invite: invite.code,
+          invite: invite0.code,
           email: user1.email,
           password: ""
         });
         expect(res.statusCode).toEqual(400);
       });
-      it("should return 400 without invite code", async () => {
+      test("should return 400 without invite code", async () => {
         const res = await request(server).post("/auth/signup").send({
           email: user1.email,
           password: user1.password
         });
         expect(res.statusCode).toEqual(400);
       });
-      it("should return 400 with wrong invite code", async () => {
+      test("should return 400 with wrong invite code", async () => {
         const res = await request(server).post("/auth/signup").send({
           invite: "invalid",
           email: user1.email,
@@ -105,7 +112,7 @@ describe("/auth", () => {
         });
         expect(res.statusCode).toEqual(400);
       });
-      it("should return 200 with a password", async () => {
+      test("should return 200 with a password", async () => {
         const res = await request(server)
           .post("/auth/signup")
           .send({ ...user1, invite: invite1.code });
@@ -115,35 +122,45 @@ describe("/auth", () => {
           username: "user1"
         });
       });
-      it("should return 409 Conflict with a repeat signup", async () => {
+      test("should return 409 Conflict with a repeat signup", async () => {
         let res = await request(server)
           .post("/auth/signup")
-          .send({ ...user0, invite: invite.code });
+          .send({ ...user0, invite: invite0.code });
         expect(res.statusCode).toEqual(200);
         res = await request(server)
           .post("/auth/signup")
           .send({ ...user0, invite: invite1.code });
         expect(res.statusCode).toEqual(409);
       });
-      it("should not store raw password", async () => {
+      test("should return 409 Conflict with a duplicate email", async () => {
+        let res = await request(server)
+          .post("/auth/signup")
+          .send({ ...user0, invite: invite0.code });
+        expect(res.statusCode).toEqual(200);
+        res = await request(server)
+          .post("/auth/signup")
+          .send({ ...user1, email: user0.email, invite: invite1.code });
+        expect(res.statusCode).toEqual(409);
+      });
+      test("should not store raw password", async () => {
         await request(server)
           .post("/auth/signup")
-          .send({ ...user0, invite: invite.code });
+          .send({ ...user0, invite: invite0.code });
         const users = await User.find().lean();
         users.forEach((user) => {
           expect(Object.values(user)).not.toContain(user0.password);
         });
       });
-      // Todo: test roles
     });
   });
+
   describe.each([user0, user1])("User %# after signup", (user) => {
-    let userObject;
+    let userObject: IUser | null = null;
     beforeEach(async () => {
-      await Invite.create(invite);
+      await Invite.create(invite0);
       await request(server)
         .post("/auth/signup")
-        .send({ ...user0, invite: invite.code });
+        .send({ ...user0, invite: invite0.code });
       await Invite.create(invite1);
       await request(server)
         .post("/auth/signup")
@@ -152,25 +169,25 @@ describe("/auth", () => {
     });
 
     describe("POST /", () => {
-      it("should return 400 when password isn't provided", async () => {
+      test("should return 400 when password isn't provided", async () => {
         const res = await request(server).post("/auth/login").send({
           email: user.email
         });
         expect(res.statusCode).toEqual(400);
       });
-      it("should return 401 when password doesn't match", async () => {
+      test("should return 401 when password doesn't match", async () => {
         const res = await request(server).post("/auth/login").send({
           email: user.email,
           password: "123"
         });
         expect(res.statusCode).toEqual(401);
       });
-      it("should return 200 and a token when password matches", async () => {
+      test("should return 200 and a token when password matches", async () => {
         const res = await request(server).post("/auth/login").send(user);
         expect(res.statusCode).toEqual(200);
         expect(typeof res.body.token).toEqual("string");
       });
-      it("should not store token on user", async () => {
+      test("should not store token on user", async () => {
         const res = await request(server).post("/auth/login").send(user);
         const token = res.body.token;
         const users = await User.find().lean();
@@ -181,7 +198,7 @@ describe("/auth", () => {
     });
 
     describe("POST /forgotpassword", () => {
-      it("should return a 200 for a valid email", async () => {
+      test("should return a 200 for a valid email", async () => {
         const res = await request(server)
           .post("/auth/forgotpassword")
           .send({ email: user.email });
@@ -198,12 +215,12 @@ describe("/auth", () => {
         hash = await bcrypt.hash(resetToken, Number(bcryptSalt));
         passwordToken0 = await PasswordToken.create({
           token: hash,
-          userId: userObject._id.toString()
+          userId: userObject?._id?.toString()
         });
       });
-      it("should return a 404 for missing userId or token", async () => {
+      test("should return a 404 for missing userId or token", async () => {
         const res = await request(server).post("/auth/resetpassword").send({
-          userId: userObject._id.toString(),
+          userId: userObject?._id?.toString(),
           token: "aaaa",
           password: "newpassword"
         });
@@ -215,18 +232,18 @@ describe("/auth", () => {
         });
         expect(res1.statusCode).toEqual(404);
       });
-      it("should return a 200 for valid userId or token", async () => {
+      test("should return a 200 for valid userId or token", async () => {
         const res = await request(server).post("/auth/resetpassword").send({
-          userId: userObject._id.toString(),
+          userId: userObject?._id?.toString(),
           token: resetToken,
           password: "newpassword"
         });
         expect(res.statusCode).toEqual(200);
         expect(sendEmail).toHaveBeenCalled();
-        const resultingUser = await User.findOne({ email: userObject.email });
+        const resultingUser = await User.findOne({ email: userObject?.email });
         const isValid = await bcrypt.compare(
           "newpassword",
-          resultingUser.password
+          resultingUser?.password || ""
         );
         expect(isValid).toBe(true);
       });
@@ -234,13 +251,13 @@ describe("/auth", () => {
   });
 
   describe("After both users login", () => {
-    let token0;
-    let token1;
+    let token0: string | undefined;
+    let token1: string | undefined;
     beforeEach(async () => {
-      await Invite.create(invite);
+      await Invite.create(invite0);
       await request(server)
         .post("/auth/signup")
-        .send({ ...user0, invite: invite.code });
+        .send({ ...user0, invite: invite0.code });
       const res0 = await request(server).post("/auth/login").send(user0);
       token0 = res0.body.token;
       await Invite.create(invite1);
@@ -252,21 +269,21 @@ describe("/auth", () => {
     });
 
     describe("POST /password", () => {
-      it("should reject bogus token", async () => {
+      test("should reject bogus token", async () => {
         const res = await request(server)
           .put("/auth/password")
           .set("Authorization", "Bearer BAD")
           .send({ password: "123" });
         expect(res.statusCode).toEqual(401);
       });
-      it("should reject empty password", async () => {
+      test("should reject empty password", async () => {
         const res = await request(server)
           .put("/auth/password")
           .set("Authorization", "Bearer " + token0)
           .send({ password: "" });
         expect(res.statusCode).toEqual(400);
       });
-      it("should change password for user0", async () => {
+      test("should change password for user0", async () => {
         const res = await request(server)
           .put("/auth/password")
           .set("Authorization", "Bearer " + token0)
@@ -282,7 +299,7 @@ describe("/auth", () => {
         const loginRes1 = await request(server).post("/auth/login").send(user1);
         expect(loginRes1.statusCode).toEqual(200);
       });
-      it("should change password for user1", async () => {
+      test("should change password for user1", async () => {
         const res = await request(server)
           .put("/auth/password")
           .set("Authorization", "Bearer " + token1)
@@ -300,14 +317,14 @@ describe("/auth", () => {
       });
     });
     describe("POST /logout", () => {
-      it("should reject bogus token", async () => {
+      test("should reject bogus token", async () => {
         const res = await request(server)
           .post("/auth/logout")
           .set("Authorization", "Bearer BAD")
           .send();
         expect(res.statusCode).toEqual(401);
       });
-      it("should prevent only user0 from making a password change", async () => {
+      test("should prevent only user0 from making a password change", async () => {
         const res = await request(server)
           .post("/auth/logout")
           .set("Authorization", "Bearer " + token0)
@@ -324,7 +341,7 @@ describe("/auth", () => {
           .send({ password: "123" });
         expect(res1.statusCode).toEqual(200);
       });
-      it("should prevent only user1 from making a password change", async () => {
+      test("should prevent only user1 from making a password change", async () => {
         const res = await request(server)
           .post("/auth/logout")
           .set("Authorization", "Bearer " + token1)

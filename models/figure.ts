@@ -1,4 +1,9 @@
-import { InferSchemaType, PaginateModel, Schema, model } from "mongoose";
+import mongoose, {
+  InferSchemaType,
+  PaginateModel,
+  Schema,
+  model
+} from "mongoose";
 import mongoosePaginate from "mongoose-paginate-v2";
 
 const figureSchema = new Schema({
@@ -24,6 +29,8 @@ figureSchema.index({ name: 1, partNumber: 1 });
 
 figureSchema.plugin(mongoosePaginate);
 
-export type IFigure = InferSchemaType<typeof figureSchema>;
+export type IFigure = InferSchemaType<typeof figureSchema> & {
+  _id?: mongoose.Types.ObjectId;
+};
 
 export default model<IFigure, PaginateModel<IFigure>>("figures", figureSchema);

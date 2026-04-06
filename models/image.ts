@@ -1,4 +1,4 @@
-import { InferSchemaType, Schema, model } from "mongoose";
+import mongoose, { InferSchemaType, Schema, model } from "mongoose";
 
 const imageSchema = new Schema({
   userId: {
@@ -20,6 +20,8 @@ const imageSchema = new Schema({
   }
 });
 
-export type IImage = InferSchemaType<typeof imageSchema>;
+export type IImage = InferSchemaType<typeof imageSchema> & {
+  _id?: mongoose.Types.ObjectId;
+};
 
 export default model("images", imageSchema);

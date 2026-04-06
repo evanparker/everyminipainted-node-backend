@@ -1,4 +1,10 @@
-import { InferSchemaType, PaginateModel, Query, Schema, model } from "mongoose";
+import mongoose, {
+  InferSchemaType,
+  PaginateModel,
+  Query,
+  Schema,
+  model
+} from "mongoose";
 import mongoosePaginate from "mongoose-paginate-v2";
 
 interface QueryWithOptions extends Query<any, any> {
@@ -44,6 +50,8 @@ miniSchema.pre<QueryWithOptions>("findOne", function () {
   }
 });
 
-export type IMini = InferSchemaType<typeof miniSchema>;
+export type IMini = InferSchemaType<typeof miniSchema> & {
+  _id?: mongoose.Types.ObjectId;
+};
 
 export default model<IMini, PaginateModel<IMini>>("minis", miniSchema);

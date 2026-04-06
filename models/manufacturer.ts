@@ -20,7 +20,9 @@ const manufacturerSchema = new Schema({
   }
 });
 
-export type IManufacturer = InferSchemaType<typeof manufacturerSchema>;
+export type IManufacturer = InferSchemaType<typeof manufacturerSchema> & {
+  _id?: Schema.Types.ObjectId;
+};
 
 manufacturerSchema.plugin(mongoosePaginate);
 
