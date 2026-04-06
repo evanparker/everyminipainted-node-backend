@@ -2,8 +2,7 @@ process.env.MY_CUSTOM_TEST_ENV_VAR = "foo";
 process.env.DB_URL = "mongodb://127.0.0.1/test";
 process.env.CLIENT_URL = "localhost:5173";
 process.env.BCRYPT_SALT = "10";
-process.env.EMAIL_POSTMARK_SERVER_CLIENT =
-  "24f31933-6b74-486d-903f-cbd3a32cb30b";
+process.env.EMAIL_POSTMARK_SERVER_CLIENT = "postmark-server-client";
 process.env.EMAIL_HOST = "smtp.zoho.com";
 process.env.EMAIL_USERNAME = "evanparker@everyminipainted.com";
 process.env.EMAIL_PORT = "465";
