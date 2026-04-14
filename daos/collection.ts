@@ -68,7 +68,7 @@ export async function getCollectionsBySearch(queryParams: any = {}) {
   );
 }
 
-export async function createCollection(obj: ICollection) {
+export async function createCollection(obj: Partial<ICollection>) {
   return await Collection.create(obj);
 }
 
@@ -95,3 +95,15 @@ export async function upsertCollection(filter: any, obj: Partial<ICollection>) {
 export async function deleteCollection(id: string) {
   return await Collection.findOneAndDelete({ _id: id });
 }
+
+export default {
+  getAllCollections,
+  getCollectionById,
+  getCollectionsIncludingFigure,
+  getCollectionsBySearch,
+  createCollection,
+  updateCollection,
+  findAndUpdateCollection,
+  upsertCollection,
+  deleteCollection
+};

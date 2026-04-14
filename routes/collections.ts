@@ -53,6 +53,10 @@ router.get("/:id", async (req, res, next) => {
 
     res.json(collection);
   } catch (e) {
+    if ((e as Error).message.includes("Cast to ObjectId failed")) {
+      res.status(404).json({ message: "Collection not found" });
+      return;
+    }
     next(e);
   }
 });

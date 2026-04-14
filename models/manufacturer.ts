@@ -1,4 +1,9 @@
-import { InferSchemaType, PaginateModel, Schema, model } from "mongoose";
+import mongoose, {
+  InferSchemaType,
+  PaginateModel,
+  Schema,
+  model
+} from "mongoose";
 import mongoosePaginate from "mongoose-paginate-v2";
 
 const manufacturerSchema = new Schema({
@@ -21,7 +26,7 @@ const manufacturerSchema = new Schema({
 });
 
 export type IManufacturer = InferSchemaType<typeof manufacturerSchema> & {
-  _id?: Schema.Types.ObjectId;
+  _id?: mongoose.Types.ObjectId;
 };
 
 manufacturerSchema.plugin(mongoosePaginate);
