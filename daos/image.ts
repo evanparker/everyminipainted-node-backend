@@ -37,3 +37,12 @@ export async function findAndUpdateImage(
 export async function deleteImage(id: string | mongoose.Types.ObjectId) {
   return await Image.findOneAndDelete({ _id: id });
 }
+
+export default {
+  getAllImages,
+  getImageById,
+  getImagesByIds,
+  createImage,
+  findAndUpdateImage,
+  deleteImage
+};

@@ -37,7 +37,9 @@ router.post("/", isLoggedIn, async (req, res, next) => {
         throw new Error("error uploading to s3");
       }
     } else {
-      throw new Error("file required");
+      res.status(400);
+      res.json({ message: "file is required" });
+      return;
     }
   } catch (e) {
     next(e);
@@ -74,7 +76,7 @@ router.put("/:id", isLoggedIn, async (req, res, next) => {
       (!user || !user.roles.includes("admin")) &&
       image.userId._id.toString() !== req.userId?.toString()
     ) {
-      res.sendStatus(401);
+      res.sendStatus(403);
       return;
     }
 
@@ -106,7 +108,7 @@ router.delete("/:id", isLoggedIn, async (req, res, next) => {
       (!user || !user.roles.includes("admin")) &&
       image.userId._id.toString() !== req.userId?.toString()
     ) {
-      res.sendStatus(401);
+      res.sendStatus(403);
       return;
     }
 

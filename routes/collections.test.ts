@@ -16,7 +16,7 @@ import figure, { IFigure } from "../models/figure";
 import image, { IImage } from "../models/image";
 import invite from "../models/invite";
 import manufacturer, { IManufacturer } from "../models/manufacturer";
-import user, { IUser } from "../models/user";
+import User, { IUser } from "../models/user";
 import server from "../server";
 import testUtils from "../test-utils";
 
@@ -61,13 +61,7 @@ describe("routes/collections", () => {
   afterAll(testUtils.stopDB);
   afterEach(async () => {
     await testUtils.clearDB();
-    getCollectionByIdSpy.mockClear();
-    getAllCollectionsSpy.mockClear();
-    getCollectionsBySearchSpy.mockClear();
-    getCollectionsIncludingFigureSpy.mockClear();
-    createCollectionSpy.mockClear();
-    updateCollectionSpy.mockClear();
-    deleteCollectionSpy.mockClear();
+    jest.clearAllMocks();
   });
 
   let images: Partial<IImage>[];
@@ -101,14 +95,14 @@ describe("routes/collections", () => {
       email: userNormal.email,
       password: userNormal.password
     });
-    exampleUser = await user.findOne({ email: userNormal.email }).lean();
+    exampleUser = await User.findOne({ email: userNormal.email }).lean();
 
     await request(server).post("/auth/login").send({
       email: userAdmin.email,
       password: userAdmin.password
     });
-    exampleAdminUser = await user.findOne({ email: userAdmin.email }).lean();
-    await user.updateOne(
+    exampleAdminUser = await User.findOne({ email: userAdmin.email }).lean();
+    await User.updateOne(
       { _id: exampleAdminUser?._id },
       { roles: ["user", "admin"] }
     );
