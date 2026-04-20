@@ -18,7 +18,7 @@ router.post("/", isLoggedIn, isAdmin, async (req, res, next) => {
   }
 });
 
-router.get("/", async (req, res, next) => {
+router.get("/", isLoggedIn, isAdmin, async (req, res, next) => {
   try {
     const invites = await getAllInvites();
     res.json(invites);
@@ -27,9 +27,15 @@ router.get("/", async (req, res, next) => {
   }
 });
 
-router.get("/:code", async (req, res, next) => {
+router.get("/:code", isLoggedIn, isAdmin, async (req, res, next) => {
   try {
-    const invite = await getInviteByCode(req.params.code);
+    let code: string;
+    if (Array.isArray(req.params.code)) {
+      code = req.params.code[0];
+    } else {
+      code = req.params.code;
+    }
+    const invite = await getInviteByCode(code);
     if (!invite) {
       res.status(404).json({ message: "Invite code not found" });
       return;

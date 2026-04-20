@@ -121,6 +121,8 @@ describe("Auth Routes /auth", () => {
           email: "user1@mail.com",
           username: "user1"
         });
+        const inviteInDb = await Invite.findOne({ code: invite1.code }).lean();
+        expect(inviteInDb).toBeNull();
       });
       test("should return 409 Conflict with a repeat signup", async () => {
         let res = await request(server)

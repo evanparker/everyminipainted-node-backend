@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 import { getUserIdFromToken } from "../daos/token";
 import { findUserById } from "../daos/user";
 
+// Extend Express Request type to include required fields
 declare module "express-serve-static-core" {
   interface Request {
     userId?: string | mongoose.Types.ObjectId;

@@ -13,5 +13,5 @@ export async function createInvite(obj: IInvite) {
 }
 
 export async function deleteInvite(code: string) {
-  return await Invite.findOneAndDelete({ code: code });
+  return await Invite.findOneAndDelete({ code: code }).lean();
 }
