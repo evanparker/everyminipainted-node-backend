@@ -80,8 +80,13 @@ router.put(
       } else {
         id = req.params.id;
       }
-      const updatedManufacturer = await updateManufacturer(id, req.body);
-      res.json(updatedManufacturer);
+      const manufacturer = await getManufacturerById(id);
+      if (!manufacturer) {
+        res.status(404).json({ message: "Manufacturer not found" });
+        return;
+      }
+      const response = await updateManufacturer(id, req.body);
+      res.json(response);
     } catch (e) {
       next(e);
     }
@@ -99,6 +104,11 @@ router.delete(
         id = req.params.id[0];
       } else {
         id = req.params.id;
+      }
+      const manufacturer = await getManufacturerById(id);
+      if (!manufacturer) {
+        res.status(404).json({ message: "Manufacturer not found" });
+        return;
       }
       const deletedManufacturer = await deleteManufacturer(id);
       res.json(deletedManufacturer);

@@ -87,6 +87,11 @@ router.put(
       } else {
         id = req.params.id;
       }
+      const collection = await getCollectionById(id);
+      if (!collection) {
+        res.status(404).json({ message: "Collection not found" });
+        return;
+      }
       const updatedCollection = await updateCollection(id, req.body);
       res.json(updatedCollection);
     } catch (e) {
@@ -106,6 +111,11 @@ router.delete(
         id = req.params.id[0];
       } else {
         id = req.params.id;
+      }
+      const collection = await getCollectionById(id);
+      if (!collection) {
+        res.status(404).json({ message: "Collection not found" });
+        return;
       }
       const deletedCollection = await deleteCollection(id);
       res.json(deletedCollection);

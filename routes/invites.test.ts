@@ -62,7 +62,8 @@ describe("routes/invites", () => {
       password: userAdmin.password
     });
     adminToken = res.body.token;
-    await jest.clearAllMocks();
+
+    await jest.clearAllMocks(); // Clear mocks after setup to avoid counting calls made during setup
   });
 
   describe("GET /", () => {
