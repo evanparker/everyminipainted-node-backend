@@ -74,6 +74,10 @@ router.put("/:id", isLoggedIn, async (req, res, next) => {
     }
 
     const mini = await getMiniById(id);
+    if (!mini) {
+      res.status(404).json({ message: "Mini not found" });
+      return;
+    }
     const user = await findUserById(req.userId);
     if (
       (!user || !user.roles.includes("admin")) &&
@@ -98,6 +102,10 @@ router.delete("/:id", isLoggedIn, async (req, res, next) => {
       id = req.params.id;
     }
     const mini = await getMiniById(id);
+    if (!mini) {
+      res.status(404).json({ message: "Mini not found" });
+      return;
+    }
     const user = await findUserById(req.userId);
     if (
       (!user || !user.roles.includes("admin")) &&
