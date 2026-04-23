@@ -20,6 +20,11 @@ router.get("/", async (req, res, next) => {
 router.get("/:id", async (req, res, next) => {
   try {
     const report = await getModerationReport(req.params.id);
+
+    if (!report) {
+      res.status(404).json({ message: "Report not found" });
+      return;
+    }
     res.json(report);
   } catch (e) {
     next(e);
