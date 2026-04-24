@@ -6,6 +6,18 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest # Use the latest Ubuntu runner
+
+    services:
+      mongodb:
+        image: mongo:7.0
+        ports:
+          - 27017:27017
+        options: >-
+          --health-cmd "mongosh --eval 'db.adminCommand(\"ping\")'"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
@@ -16,4 +28,6 @@ jobs:
       - name: Install Dependencies
         run: npm install
       - name: Run Tests
+        env:
+          DB_URL: mongodb://localhost:27017/test
         run: npm test
