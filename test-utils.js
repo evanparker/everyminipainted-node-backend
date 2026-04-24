@@ -1,20 +1,22 @@
 const mongoose = require("mongoose");
 const models = [
-  require("./models/user"),
-  require("./models/image"),
-  require("./models/token"),
-  require("./models/mini"),
-  require("./models/manufacturer"),
-  require("./models/figure"),
-  require("./models/invite"),
-  require("./models/passwordToken"),
-  require("./models/moderationReport")
+  require("./models/user").default,
+  require("./models/image").default,
+  require("./models/token").default,
+  require("./models/mini").default,
+  require("./models/manufacturer").default,
+  require("./models/figure").default,
+  require("./models/invite").default,
+  require("./models/passwordToken").default,
+  require("./models/moderationReport").default,
+  require("./models/collection").default
 ];
 
 module.exports = {};
 
 module.exports.connectDB = async () => {
-  await mongoose.connect(process.env.MONGO_URL, {});
+  // console.log("Connecting to MongoDB...", process.env.DB_URL);
+  await mongoose.connect(process.env.DB_URL || "mongodb://127.0.0.1/test", {});
   await Promise.all(models.map((m) => m.syncIndexes()));
 };
 
