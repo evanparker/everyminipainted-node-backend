@@ -27,10 +27,6 @@ router.get("/:username/minis", async (req, res, next) => {
 router.get("/me", isLoggedIn, async (req, res, next) => {
   try {
     let user = await findUserById(req.userId);
-    if (!user) {
-      res.status(404).json({ message: "User not found" });
-      return;
-    }
     delete (user as { password?: string }).password;
     res.json(user);
   } catch (e) {
@@ -45,10 +41,6 @@ router.put("/me/setfavorite/", isLoggedIn, async (req, res, next) => {
       user = await addFavorite(req.userId, req.body.id);
     } else {
       user = await removeFavorite(req.userId, req.body.id);
-    }
-    if (!user) {
-      res.status(404).json({ message: "User not found" });
-      return;
     }
     delete (user as { password?: string }).password;
     res.json(user);

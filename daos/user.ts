@@ -57,6 +57,9 @@ export async function removeFavorite(
   if (!user) {
     throw new Error("User not found");
   }
+  if (!user.favorites.has(_id)) {
+    throw new Error("Mini not in favorites");
+  }
   user.favorites.delete(_id);
   await Mini.findByIdAndUpdate(_id, { $inc: { favorites: -1 } });
   return await user.save();
